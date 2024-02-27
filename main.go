@@ -35,8 +35,6 @@ type Request struct {
 }
 
 func main() {
-	// https://www.digitalocean.com/community/tutorials/understanding-init-in-go-ru
-	// and also gorm
 	var err error
 	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 
@@ -55,7 +53,6 @@ func main() {
 	}()
 
 	go func() {
-		// context with cancelling? https://go.dev/doc/database/cancel-operations
 		ticker := time.NewTicker(5 * time.Second) // timeout -> config
 		defer ticker.Stop()
 
@@ -66,7 +63,7 @@ func main() {
 			}
 		}
 	}()
-	select {} // graceful shutdown
+	select {}
 }
 
 func FindCurrency(code string) (Cross, error) {
@@ -91,7 +88,7 @@ func createRequestHandler(ctx *gin.Context) {
 	var request Request
 
 	if err := ctx.BindJSON(&request); err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "cant create new request"}) // dont use str constants in code
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "cant create new request"}) // TODO remove str constants in code
 		return
 	}
 
@@ -100,21 +97,21 @@ func createRequestHandler(ctx *gin.Context) {
 		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Fffffffuuuuu!!11"})
 		return
 	}
-	log.Println(res) // TODO: use slog or zap logger
+	log.Println(res) // TODO: try 2 use slog or zap logger
 
 	if result := db.Create(&request); result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()}) // dont return DB errors, log it
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()}) // TODO dont return DB errors, log it
 	}
 
 	ctx.IndentedJSON(http.StatusCreated, gin.H{"request id": &request.ID})
 }
 
 func getRequestHandler(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id")) // check err, validate this
+	id, _ := strconv.Atoi(ctx.Param("id")) // TODO validation
 
 	var request = Request{ID: id}
 
-	if result := db.Find(&request); result.Error != nil { // need checking gorm error not found, else internal error
+	if result := db.Find(&request); result.Error != nil { // TODO need checking gorm error not found, else internal error
 		ctx.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
 		return
 	}
@@ -130,7 +127,7 @@ func getLatestUpdatedRequestHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &request)
 }
 
-func updateRequests() { // make it parallels, init workers count
+func updateRequests() { // TODO mb make it parallels, init workers count?
 	requests := GetNotUpdatedRequests()
 	if len(requests) == 0 {
 		log.Println("Nothing to update")
@@ -145,7 +142,7 @@ func updateRequests() { // make it parallels, init workers count
 	log.Printf("Successfully updated %d row(s)", len(requests))
 }
 
-func splitCodeIntoPair(code string) (string, string) { // add check for code (e.g. there is no '/' or smth like that)
+func splitCodeIntoPair(code string) (string, string) { // TODO validation? add check for code (e.g. there is no '/' or smth like that)
 	codes := strings.Split(code, "/")
 	base := codes[0]
 	target := codes[1]
@@ -153,16 +150,15 @@ func splitCodeIntoPair(code string) (string, string) { // add check for code (e.
 }
 
 func getCurrencyRate(base, target string) (float64, error) {
-	url := url_pair + strings.ToLower(base) + "/" + strings.ToLower(target) // printf
+	url := url_pair + strings.ToLower(base) + "/" + strings.ToLower(target) // TODO printf
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
 		// log.Println("error: ", err)
-		return 0, err // TODO
+		return 0, err
 	}
 
-	// client := http.Client{} //
-	// need timeout
+	// client := http.Client{}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		// log.Println("error: ", err)
@@ -173,7 +169,7 @@ func getCurrencyRate(base, target string) (float64, error) {
 
 	// body, err := io.ReadAll(resp.Body) // io
 	// err = json.Unmarshal(body, &result)
-	var result map[string]interface{} // make struct with response structure
+	var result map[string]interface{} // TODO make struct with response structure
 
 	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return 0, err
