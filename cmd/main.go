@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
+	// "net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +14,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+
+	"github.com/ovrsun/currency-updater/internal/api"
+
 )
 
 var db *gorm.DB
@@ -48,7 +51,7 @@ func main() {
 		router := gin.Default()
 		router.POST("/updates", createRequestHandler)
 		router.GET("/updates/:id", getRequestHandler)
-		router.GET("/updates/", getLatestUpdatedRequestHandler)
+		router.GET("/updates/", GetLatestUpdatedRequestHandler)
 		router.Run("localhost:8082")
 	}()
 
@@ -119,13 +122,8 @@ func getRequestHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &request)
 }
 
-func getLatestUpdatedRequestHandler(ctx *gin.Context) {
-	var request Request
-	code := ctx.Query("code")
-	code2 := url.QueryEscape(code)
-	db.Order("updated DESC").First(&request)
-	ctx.JSON(http.StatusOK, &request)
-}
+////
+
 
 func updateRequests() { // TODO mb make it parallels, init workers count?
 	requests := GetNotUpdatedRequests()
@@ -136,7 +134,7 @@ func updateRequests() { // TODO mb make it parallels, init workers count?
 
 	for _, request := range requests {
 		base, target := splitCodeIntoPair(request.Code) // eur/usd
-		rate, err := getCurrencyRate(base, target)
+		rate, _ := getCurrencyRate(base, target)
 		db.Model(&request).Select("updated", "rate").Updates(map[string]interface{}{"updated": time.Now().UTC(), "rate": rate})
 	}
 	log.Printf("Successfully updated %d row(s)", len(requests))
