@@ -30,3 +30,11 @@ func GetNotUpdatedRequests() []Request {
 	db.Where("rate = ?", 0.0).Find(&requests)
 	return requests
 }
+
+func CreateRequest(request *Request) *gorm.DB {
+	return db.Create(&request)
+}
+
+func FindRequest(request *Request) *gorm.DB {
+	return db.Find(&request)
+}
