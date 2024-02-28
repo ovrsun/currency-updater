@@ -1,7 +1,7 @@
 package api
 
 import (
-	model "currency-checker/internal/database"
+	model "currency-updater/internal/database"
 	"log"
 	"net/http"
 	"strconv"

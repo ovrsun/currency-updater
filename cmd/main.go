@@ -1,10 +1,11 @@
 package main
 
 import (
-	conf "currency-checker/config"
-	"currency-checker/internal/api"
-	model "currency-checker/internal/database"
-	currency "currency-checker/internal/services"
+	conf "currency-updater/config"
+	api "currency-updater/internal/api"
+	model "currency-updater/internal/database"
+	init_db "currency-updater/internal/init"
+	currency "currency-updater/internal/services"
 
 	"time"
 
@@ -14,7 +15,7 @@ import (
 func main() {
 	var db = conf.ConnectDB()
 	model.SetDB(db)
-	db.AutoMigrate(&model.Cross{}, &model.Request{})
+	init_db.InitializeDB(db)
 
 	go func() {
 		router := gin.Default()

@@ -1,7 +1,7 @@
 package currency
 
 import (
-	model "currency-checker/internal/database"
+	model "currency-updater/internal/database"
 	"encoding/json"
 	"log"
 	"net/http"
