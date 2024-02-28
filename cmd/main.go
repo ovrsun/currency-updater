@@ -19,7 +19,7 @@ func main() {
 	go func() {
 		router := gin.Default()
 		api.RegisterRotes(router)
-		router.Run("localhost:8082")
+		router.Run(":8081")
 	}()
 
 	go func() {
