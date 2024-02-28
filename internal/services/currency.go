@@ -23,7 +23,8 @@ func SplitCodeIntoPair(code string) (string, string) {
 	return base, target
 }
 
-func UpdateRequests(db *gorm.DB) { // TODO mb make it parallels, init workers count?
+func UpdateRequests(db *gorm.DB) {
+	// TODO mb make it parallels, init workers count?
 	requests := model.GetNotUpdatedRequests()
 	if len(requests) == 0 {
 		log.Println("Nothing to update")
