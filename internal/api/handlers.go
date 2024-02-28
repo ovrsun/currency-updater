@@ -13,13 +13,13 @@ func CreateRequestHandler(ctx *gin.Context) {
 	var request model.Request
 
 	if err := ctx.BindJSON(&request); err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "cant create new request"}) // TODO remove str constants in code
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Can't create new request"}) // TODO remove str constants in code
 		return
 	}
 
-	res, err := model.FindCurrency(request.Code)
+	res, err := model.FindCurrenciesCode(request.Code)
 	if err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Fffffffuuuuu!!11"})
+		ctx.IndentedJSON(http.StatusBadRequest, gin.H{"message": "The currency does not exist"})
 		return
 	}
 	log.Println(res) // TODO: try 2 use slog or zap logger

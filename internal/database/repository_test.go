@@ -7,17 +7,23 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestFindCurrency(t *testing.T) {
+const (
+	ConnectionFailedError = "Failed to connect to db: %s"
+	MigrationFailedError  = "Failed to migrate db: %s"
+	CreationTestDataError = "Failed to create test data: %s"
+)
+
+func TestFindCurrenciesCode(t *testing.T) {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	SetDB(db)
 
 	if err != nil {
-		t.Fatalf("Error while connecting to db: %s", err)
+		t.Fatalf(ConnectionFailedError, err)
 	}
 
 	err = db.AutoMigrate(&Cross{})
 	if err != nil {
-		t.Fatalf("Error while migrating: %s", err)
+		t.Fatalf(MigrationFailedError, err)
 	}
 
 	testData := []Cross{
@@ -27,18 +33,32 @@ func TestFindCurrency(t *testing.T) {
 
 	for _, data := range testData {
 		if err = db.Create(&data).Error; err != nil {
-			t.Fatalf("Error while creating test data: %s", err)
+			t.Fatalf(CreationTestDataError, err)
 		}
 	}
 
 	code := "EUR/USD"
-	cross, err := FindCurrency(code)
+	cross, err := FindCurrenciesCode(code)
 	if err != nil {
-		t.Fatalf("Error while finding currency by code: %s", err)
+		t.Fatalf("Failed to find currency by code: %s", err)
 	}
 
 	expected := "EUR/USD"
 	if cross.Code != expected {
 		t.Errorf("Expected result: %s, got: %s", expected, cross.Code)
+	}
+}
+
+func TestCreateRequest(t *testing.T) {
+	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	SetDB(db)
+
+	if err != nil {
+		t.Fatalf(ConnectionFailedError, err)
+	}
+
+	err = db.AutoMigrate(&Cross{})
+	if err != nil {
+		t.Fatalf(MigrationFailedError, err)
 	}
 }

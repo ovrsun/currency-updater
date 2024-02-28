@@ -3,6 +3,7 @@ package currency
 import (
 	model "currency-updater/internal/database"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strings"
@@ -14,13 +15,26 @@ import (
 var key = "bf8ab72c635dc35b3d27a5da"
 var url_pair = "https://v6.exchangerate-api.com/v6/" + key + "/pair/"
 
-func SplitCodeIntoPair(code string) (string, string) {
-	// TODO validation? add check for code
-	// (e.g. there is no '/' or smth like that)
+func validateCode(code string) bool {
+	if len(code) > 7 {
+		return false
+	}
+
+	if contains_slash := strings.Contains(code, "/"); !contains_slash {
+		return false
+	}
+	return true
+}
+
+func SplitCodeIntoPair(code string) (string, string, error) {
+	if valid_code := validateCode(code); !valid_code {
+		return "", "", errors.New("invalid currencies code")
+	}
+
 	codes := strings.Split(code, "/")
 	base := codes[0]
 	target := codes[1]
-	return base, target
+	return base, target, nil
 }
 
 func UpdateRequests(db *gorm.DB) {
@@ -32,7 +46,7 @@ func UpdateRequests(db *gorm.DB) {
 	}
 
 	for _, request := range requests {
-		base, target := SplitCodeIntoPair(request.Code) // eur/usd
+		base, target, _ := SplitCodeIntoPair(request.Code) // eur/usd
 		rate, _ := getCurrencyRate(base, target)
 		db.Model(&request).Select("updated", "rate").Updates(map[string]interface{}{"updated": time.Now().UTC(), "rate": rate})
 	}

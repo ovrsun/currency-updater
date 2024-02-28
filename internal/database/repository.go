@@ -14,7 +14,7 @@ func SetDB(database *gorm.DB) {
 	db = database
 }
 
-func FindCurrency(code string) (Cross, error) {
+func FindCurrenciesCode(code string) (Cross, error) {
 	var cross Cross
 
 	if result := db.Where("code = ?", code).First(&cross); result.Error != nil {
