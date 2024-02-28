@@ -19,8 +19,6 @@ func main() {
 	go func() {
 		router := gin.Default()
 		api.RegisterRotes(router)
-		// router.POST("/updates", api.CreateRequestHandler)
-		// router.GET("/updates/:id", api.GetRequestHandler)
 		router.Run("localhost:8082")
 	}()
 
