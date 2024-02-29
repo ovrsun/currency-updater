@@ -4,16 +4,25 @@ import (
 	model "currency-updater/internal/database"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"gorm.io/gorm"
 )
 
-var key = "bf8ab72c635dc35b3d27a5da"
-var url_pair = "https://v6.exchangerate-api.com/v6/" + key + "/pair/"
+var APIKey, APIurl string
+
+// var key = "bf8ab72c635dc35b3d27a5da"
+// var url_pair = "https://v6.exchangerate-api.com/v6/" + key + "/pair/"
+
+func SetAPIKey() {
+	APIKey = os.Getenv("API_KEY")
+	APIurl = os.Getenv("API_URL")
+}
 
 func validateCode(code string) bool {
 	if len(code) > 7 {
@@ -54,8 +63,12 @@ func UpdateRequests(db *gorm.DB) {
 }
 
 func getCurrencyRate(base, target string) (float64, error) {
-	url := url_pair + strings.ToLower(base) + "/" + strings.ToLower(target) // TODO printf
-	req, err := http.NewRequest("GET", url, nil)
+	// url := url_pair + strings.ToLower(base) + "/" + strings.ToLower(target) // TODO printf
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf(APIurl, APIKey, strings.ToLower(base), strings.ToLower(target)),
+		nil,
+	)
 
 	if err != nil {
 		// log.Println("error: ", err)
