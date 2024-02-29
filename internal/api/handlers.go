@@ -25,7 +25,8 @@ func CreateRequestHandler(ctx *gin.Context) {
 	log.Println(res) // TODO: try 2 use slog or zap logger
 
 	if result := model.CreateRequest(&request); result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()}) // TODO dont return DB errors, log it
+		log.Printf("Failed to to create request: %v", result.Error)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
 	}
 
 	ctx.IndentedJSON(http.StatusCreated, gin.H{"request id": &request.ID})
