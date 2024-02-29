@@ -36,7 +36,7 @@ func GetRequestHandler(ctx *gin.Context) {
 
 	var request = model.Request{ID: id}
 
-	if result := model.FindRequest(&request); result.Error != nil { // TODO need checking gorm error not found, else internal error
+	if result := model.FindRequest(&request); result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
 		return
 	}

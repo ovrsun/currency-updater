@@ -27,7 +27,7 @@ func main() {
 	}()
 
 	go func() {
-		ticker := time.NewTicker(5 * time.Second) // timeout -> config
+		ticker := time.NewTicker(conf.Timeout)
 		defer ticker.Stop()
 
 		for {
