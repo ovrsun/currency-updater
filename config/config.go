@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"gorm.io/driver/postgres"
+
+	// "gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
-
-var Timeout = 1 * time.Minute
 
 func ConnectDB() *gorm.DB {
 	path := fmt.Sprintf(
@@ -31,3 +30,12 @@ func ConnectDB() *gorm.DB {
 
 	return db
 }
+
+// func ConnectDB() *gorm.DB {
+// 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	return db
+// }
