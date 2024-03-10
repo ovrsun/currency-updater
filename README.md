@@ -63,7 +63,7 @@ This service provides functionality to update currency exchange rates, retrieve 
 To run the service, follow these steps:
 
 1. Clone the repository to your local machine.
-2. Create a `.env` (`mv .env.example .env`) file and specify your API key for the external service exchangerate-api.com.
+2. Create a `.env` (`cp .env.example .env`) file and specify your API key for the external service exchangerate-api.com.
 3. Start Docker Compose using the following command:
    ```
    docker-compose up
